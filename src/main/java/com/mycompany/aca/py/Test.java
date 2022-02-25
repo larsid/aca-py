@@ -5,7 +5,6 @@
 package com.mycompany.aca.py;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import kotlin.collections.ArrayDeque;
@@ -13,13 +12,13 @@ import org.hyperledger.aries.AriesClient;
 import static org.hyperledger.aries.api.AcaPyRequestFilter.log;
 import org.hyperledger.aries.api.connection.ConnectionReceiveInvitationFilter;
 import org.hyperledger.aries.api.connection.ConnectionRecord;
-import org.hyperledger.aries.api.connection.ConnectionState;
 import org.hyperledger.aries.api.connection.ReceiveInvitationRequest;
+import org.hyperledger.aries.api.credential_definition.CredentialDefinition.CredentialDefinitionRequest;
+import org.hyperledger.aries.api.credential_definition.CredentialDefinition.CredentialDefinitionResponse;
 import org.hyperledger.aries.api.issue_credential_v1.V1CredentialProposalRequest;
 import org.hyperledger.aries.api.schema.SchemaSendRequest;
 import org.hyperledger.aries.api.schema.SchemaSendResponse;
 import org.hyperledger.aries.api.schema.SchemaSendResponse.Schema;
-import org.hyperledger.aries.api.schema.SchemasCreatedFilter;
 
 
 /**
@@ -38,16 +37,27 @@ public class Test {
         
         System.out.println("\n******************\nconnectionIds: " + connectionId + "\n***********************\n");
 
-        Optional <List<ConnectionRecord>> connections= ac.connections();
+        List<String> attr = new ArrayDeque<>(); //lista de atributos
         
-        List<String> attr = new ArrayDeque<>();
-        
-        attr.add("name");
+        attr.add("name"); //atributo
         attr.add("email");
         
-        SchemaSendRequest schema = SchemaSendRequest.builder().attributes(attr).schemaName("My Scheme").schemaVersion("1.0").build();
+        SchemaSendRequest schema = SchemaSendRequest.builder().attributes(attr).schemaName("Other Scheme").schemaVersion("1.0").build(); //criando esquema
         
-        ac.schemas(schema);
+        Optional<SchemaSendResponse> response = ac.schemas(schema); //adicionando esquema
+        
+        String schemeID = response.get().getSchemaId();
+        
+        System.out.println(schemeID); //pegando o ID do schema
+        
+        CredentialDefinitionRequest defReq = CredentialDefinitionRequest.builder().schemaId(schemeID).supportRevocation(Boolean.FALSE).tag("TCC").build(); 
+                
+        Optional<CredentialDefinitionResponse> credential = ac.credentialDefinitionsCreate(defReq);
+        
+        String credentialDefinitionID = credential.get().getCredentialDefinitionId();
+        
+        
+        Optional <List<ConnectionRecord>> connections= ac.connections();
         
         for(ConnectionRecord c: connections.get()){
             
