@@ -5,6 +5,7 @@
 package com.mycompany.aca.py;
 
 import com.google.gson.JsonObject;
+import com.google.zxing.WriterException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,8 +40,7 @@ public class Test {
 
     private static AriesClient ac;
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        final Scanner scan = new Scanner(System.in);
+    public static void main(String[] args) throws IOException, InterruptedException, WriterException {
         final String AGENT_ADDR = "localhost";
         final String AGENT_PORT = "8021";
         final String END_POINT = "http://b71c-177-99-172-106.ngrok.io";
@@ -48,6 +48,9 @@ public class Test {
         AriesClient ac = getAriesClient(AGENT_ADDR, AGENT_PORT);
 
         String did = ac.walletDidPublic().get().getDid(); //Did publico
+        String presentationId = null;
+
+        final Scanner scan = new Scanner(System.in);
 
         boolean menuControl = true;
 
@@ -61,6 +64,7 @@ public class Test {
             System.out.println("6 - Listar Conexões");
             System.out.println("7 - Listar Definições de credenciais");
             System.out.println("8 - Solicitar prova de credenciais");
+            System.out.println("9 - Verificar apresentação de prova de credenciais");
             System.out.println("0 - Exit\n");
 
             switch (scan.nextInt()) {
@@ -86,7 +90,10 @@ public class Test {
                     getCredentialDefinition(did);
                     break;
                 case 8:
-                    requestProofCredential(ac, did);
+                    presentationId = requestProofCredential(ac, did);
+                    break;
+                case 9:
+                    VerifyPresentation(ac, presentationId);
                     break;
                 case 0:
                     menuControl = false;
@@ -109,9 +116,10 @@ public class Test {
     }
 
     //Gera um invitation url para conexão
-    public static void createInvitation(AriesClient ac, String END_POINT) throws IOException {
+    public static void createInvitation(AriesClient ac, String END_POINT) throws IOException, WriterException {
         Optional<CreateInvitationResponse> responseCI = ac.connectionsCreateInvitation(CreateInvitationRequest.builder().myLabel("Agent_Three").serviceEndpoint(END_POINT).build());
         System.out.println("Invitation URL: " + responseCI.get().getInvitationUrl());
+        Util.generateQRCode(responseCI.get().getInvitationUrl());
     }
 
     //Gera o schema de forma estática / TODO: tonar criação de schema de forma dinâmica
@@ -268,8 +276,11 @@ public class Test {
 
     //verificação da apresentação
     public static boolean VerifyPresentation(AriesClient ac, String presentationId) throws IOException {
-        boolean response = ac.presentProofRecordsVerifyPresentation(presentationId).get().getVerified();
-        System.out.println("Apresentada: " + response);
-        return response;
+        if (presentationId!=null) {
+            boolean response = ac.presentProofRecordsVerifyPresentation(presentationId).get().getVerified();
+            System.out.println("Apresentada: " + response);
+            return response;
+        }
+        return false;
     }
 }
