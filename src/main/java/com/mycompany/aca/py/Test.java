@@ -7,25 +7,36 @@ package com.mycompany.aca.py;
 import com.google.gson.JsonObject;
 import com.google.zxing.WriterException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
 import org.hyperledger.aries.AriesClient;
+import org.hyperledger.aries.api.connection.ConnectionAcceptInvitationFilter;
+import org.hyperledger.aries.api.connection.ConnectionAcceptRequestFilter;
+import org.hyperledger.aries.api.connection.ConnectionReceiveInvitationFilter;
 import org.hyperledger.aries.api.connection.ConnectionRecord;
 import org.hyperledger.aries.api.connection.CreateInvitationRequest;
 import org.hyperledger.aries.api.connection.CreateInvitationResponse;
+import org.hyperledger.aries.api.connection.ReceiveInvitationRequest;
 import org.hyperledger.aries.api.credential_definition.CredentialDefinition;
 import org.hyperledger.aries.api.credential_definition.CredentialDefinition.CredentialDefinitionRequest;
 import org.hyperledger.aries.api.credential_definition.CredentialDefinition.CredentialDefinitionResponse;
 import org.hyperledger.aries.api.credential_definition.CredentialDefinitionFilter;
 import org.hyperledger.aries.api.credentials.CredentialAttributes;
 import org.hyperledger.aries.api.credentials.CredentialPreview;
+import org.hyperledger.aries.api.issue_credential_v1.CredentialExchangeRole;
+import org.hyperledger.aries.api.issue_credential_v1.CredentialExchangeState;
+import org.hyperledger.aries.api.issue_credential_v1.IssueCredentialRecordsFilter;
 import org.hyperledger.aries.api.issue_credential_v1.V1CredentialExchange;
 import org.hyperledger.aries.api.issue_credential_v1.V1CredentialProposalRequest;
+import org.hyperledger.aries.api.issue_credential_v1.V1CredentialStoreRequest;
+import org.hyperledger.aries.api.present_proof.PresentProofRecordsFilter;
 import org.hyperledger.aries.api.present_proof.PresentProofRequest;
 import org.hyperledger.aries.api.present_proof.PresentationExchangeRecord;
+import org.hyperledger.aries.api.present_proof.PresentationExchangeRole;
 import org.hyperledger.aries.api.present_proof.PresentationExchangeState;
 import org.hyperledger.aries.api.schema.SchemaSendRequest;
 import org.hyperledger.aries.api.schema.SchemaSendResponse;
@@ -93,7 +104,7 @@ public class Test {
                     presentationId = requestProofCredential(ac, did);
                     break;
                 case 9:
-                    VerifyPresentation(ac, presentationId);
+                    verifyPresentation(ac, presentationId);
                     break;
                 case 0:
                     menuControl = false;
@@ -275,12 +286,112 @@ public class Test {
     }
 
     //verificação da apresentação
-    public static boolean VerifyPresentation(AriesClient ac, String presentationId) throws IOException {
-        if (presentationId!=null) {
+    public static boolean verifyPresentation(AriesClient ac, String presentationId) throws IOException {
+        if (presentationId != null) {
             boolean response = ac.presentProofRecordsVerifyPresentation(presentationId).get().getVerified();
             System.out.println("Apresentada: " + response);
             return response;
         }
         return false;
     }
+
+    //recepção de convite
+    public static void receiveInvitation(AriesClient ac) throws IOException {
+        String type = "";
+        String id = "";
+        String did = "";
+        List<String> recipientKeys = new ArrayList<>();
+        String label = "";
+        String serviceUrl = "";
+        List<String> routingKeys = new ArrayList<>();
+        String imageUrl = "";
+
+        ReceiveInvitationRequest invite = ReceiveInvitationRequest.builder().
+                type(type).id(id).did(did).recipientKeys(recipientKeys).
+                label(label).serviceEndpoint(serviceUrl).routingKeys(routingKeys).
+                imageUrl(imageUrl).build();
+
+        String alias = "";
+        Boolean autoAccept = true;
+        String mediationId = "";
+
+        ConnectionReceiveInvitationFilter filter = ConnectionReceiveInvitationFilter.builder().alias(alias).autoAccept(autoAccept).mediationId(mediationId).build();
+
+        Optional<ConnectionRecord> connectionRecord = ac.connectionsReceiveInvitation(invite, filter);
+
+        ConnectionRecord connectionRecord1 = connectionRecord.get();
+    }
+
+    //aceitação de convite
+    public static void acceptInvitation(AriesClient ac) throws IOException {
+        String connectionId = "";
+        String mediationId = "";
+        String myEndPoint = "";
+        String myLabel = "";
+
+        ConnectionAcceptInvitationFilter filter = ConnectionAcceptInvitationFilter.builder().
+                mediationId(mediationId).myEndpoint(myEndPoint).myLabel(myLabel).build();
+
+        Optional<ConnectionRecord> connectionRecord = ac.connectionsAcceptInvitation(connectionId, filter);
+
+        ConnectionRecord connectionRecord1 = connectionRecord.get();
+
+    }
+
+    //confirmando a aceitação
+    public static void acceptRequest(AriesClient ac) throws IOException {
+        String connectionId = "";
+        String myEndPoint = "";
+
+        ConnectionAcceptRequestFilter filter = ConnectionAcceptRequestFilter.builder().myEndpoint(myEndPoint).build();
+
+        Optional<ConnectionRecord> connectionRecord = ac.connectionsAcceptRequest(connectionId, filter);
+
+        ConnectionRecord connectionRecord1 = connectionRecord.get();
+
+    }
+
+    //recuperando credenciais gravadas
+    public static void getCredentialExchange(AriesClient ac) throws IOException {
+        String connectionId = "";
+        CredentialExchangeRole credentialExchangeRole = CredentialExchangeRole.HOLDER;
+        CredentialExchangeState credentialExchangeState = CredentialExchangeState.CREDENTIAL_RECEIVED;
+        String threadId = "";
+        
+        IssueCredentialRecordsFilter filter = IssueCredentialRecordsFilter.builder().connectionId(connectionId).
+                role(credentialExchangeRole).state(credentialExchangeState).threadId(connectionId).build();
+        
+        Optional <List<V1CredentialExchange>> credentialsExchange = ac.issueCredentialRecords(filter);
+        
+        List<V1CredentialExchange> credentialsExchange1 = credentialsExchange.get();
+    }
+    
+    //armazenar credencial na carteira
+    public static void storeCredentialWallet(AriesClient ac) throws IOException{
+        String credentialExchangeId = "";
+        String credentialId = "";
+        
+        V1CredentialStoreRequest request = V1CredentialStoreRequest.builder().credentialId(credentialId).build();
+        
+        Optional <V1CredentialExchange> credentialExchange = ac.issueCredentialRecordsStore(credentialExchangeId, request);
+        
+        V1CredentialExchange credentialExchange1 = credentialExchange.get();
+    }
+    
+    //verificar recepção de prova
+    public static void presentProof(AriesClient ac) throws IOException{
+        String connectionId = "";
+        PresentationExchangeRole presentationExchangeRole = PresentationExchangeRole.PROVER;
+        PresentationExchangeState presentationExchangeState = PresentationExchangeState.PRESENTATION_RECEIVED;
+        String threadId = "";
+        
+        PresentProofRecordsFilter filter = PresentProofRecordsFilter.builder().connectionId(connectionId).
+                role(presentationExchangeRole).state(presentationExchangeState).threadId(threadId).build();
+        
+        Optional <List<PresentationExchangeRecord>> presentationExchangeRecords = ac.presentProofRecords(filter);
+        
+        List<PresentationExchangeRecord> presentationExchangeRecords1 = presentationExchangeRecords.get();
+        
+    }
+
 }
