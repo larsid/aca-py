@@ -33,6 +33,8 @@ import org.hyperledger.aries.api.issue_credential_v1.IssueCredentialRecordsFilte
 import org.hyperledger.aries.api.issue_credential_v1.V1CredentialExchange;
 import org.hyperledger.aries.api.issue_credential_v1.V1CredentialProposalRequest;
 import org.hyperledger.aries.api.issue_credential_v1.V1CredentialStoreRequest;
+import org.hyperledger.aries.api.ledger.TAAAccept;
+import org.hyperledger.aries.api.ledger.TAAInfo;
 import org.hyperledger.aries.api.present_proof.PresentProofRecordsFilter;
 import org.hyperledger.aries.api.present_proof.PresentProofRequest;
 import org.hyperledger.aries.api.present_proof.PresentationExchangeRecord;
@@ -47,15 +49,15 @@ import org.hyperledger.aries.api.schema.SchemasCreatedFilter;
  *
  * @author Emers
  */
-public class Test {
+public class AriesAgent {
 
     private static AriesClient ac;
 
     public static void main(String[] args) throws IOException, InterruptedException, WriterException {
         final String AGENT_ADDR = "localhost";
         final String AGENT_PORT = "8021";
-        final String END_POINT = "http://b71c-177-99-172-106.ngrok.io";
-
+        final String END_POINT = "http://ee87-45-164-135-26.ngrok.io";
+        
         AriesClient ac = getAriesClient(AGENT_ADDR, AGENT_PORT);
 
         String did = ac.walletDidPublic().get().getDid(); //Did publico
@@ -83,7 +85,7 @@ public class Test {
                     createInvitation(ac, END_POINT);
                     break;
                 case 2:
-                    credentialDefinition(ac);
+                    credentialDefinition(ac, scan);
                     break;
                 case 3:
                     issueCredentialV1(ac, scan, did);
@@ -133,24 +135,51 @@ public class Test {
         Util.generateQRCode(responseCI.get().getInvitationUrl());
     }
 
-    //Gera o schema de forma estática / TODO: tonar criação de schema de forma dinâmica
-    public static Optional<SchemaSendResponse> createSchema(AriesClient ac) throws IOException {
-        List<String> attributes = new LinkedList<String>();
-        attributes.add("nome");
-        attributes.add("email");
-        attributes.add("matricula");
+    //Gera o schema de forma estática
+    public static Optional<SchemaSendResponse> createSchema(AriesClient ac, Scanner scan) throws IOException {
+    	System.out.print("Informe o nome do Schema: ");
+    	String schemaName = scan.next();
+    	
+    	System.out.print("Informe a versão do Schema: ");
+    	String version = scan.next();
+    	
+        List<String> attributes = attributesSchema(scan);
 
-        Optional<SchemaSendResponse> response = ac.schemas(SchemaSendRequest.builder().schemaName("aluno").schemaVersion("1.0").attributes(attributes).build());
+        Optional<SchemaSendResponse> response = ac.schemas(
+        		SchemaSendRequest.builder()
+        		.schemaName(schemaName)
+        		.schemaVersion(version)
+        		.attributes(attributes)
+        		.build()
+    		);
 
         System.out.println("Schema:");
         System.out.println(response.get().toString());
 
         return response;
     }
+    
+    //Método para obter os atributos para o schema
+    public static List<String> attributesSchema(Scanner scan) {
+    	List<String> attributes = new LinkedList<String>();
+    	
+    	while(true) {
+    		System.out.print("Informe o Nome do atributo ou digite 0 para encerrar: ");
+    		String atr = scan.next();
+    		
+    		if(atr.equals("0")) {
+    			break;
+    		} else {
+    			attributes.add(atr);
+    		}
+    	}
+    	
+    	return attributes;
+    }
 
     // Envia uma definição de credencial para o ledger (blockchain), nesse caso utiliza a schema estático criado no método acima ( createSchema() )
-    public static String credentialDefinition(AriesClient ac) throws IOException {
-        Optional<SchemaSendResponse> schema = createSchema(ac);
+    public static String credentialDefinition(AriesClient ac, Scanner scan) throws IOException {
+        Optional<SchemaSendResponse> schema = createSchema(ac, scan);
 
         Optional<CredentialDefinitionResponse> response = ac.credentialDefinitionsCreate(CredentialDefinitionRequest.builder().schemaId(schema.get().getSchemaId()).supportRevocation(false).tag("Agent_Three").revocationRegistrySize(1000).build());
 
