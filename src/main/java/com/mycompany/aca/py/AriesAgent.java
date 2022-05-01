@@ -69,34 +69,35 @@ public class AriesAgent {
 
         do {
             System.out.println("Menu Aries Agent\n");
-            System.out.println("1 - Gerar url de Conexão");
-            System.out.println("2 - Criar Definição de credencial");
-            System.out.println("3 - Emitir Credencial");
-            System.out.println("4 - Exibir Schemas Criados");
-            System.out.println("5 - Exibir schema por ID");
-            System.out.println("6 - Listar Conexões");
-            System.out.println("7 - Listar Definições de credenciais");
-            System.out.println("8 - Solicitar prova de credenciais");
-            System.out.println("9 - Verificar apresentação de prova de credenciais");
-            System.out.println("0 - Exit\n");
+            System.out.println("1  - Gerar url de Conexão");
+            System.out.println("2  - Criar Definição de credencial");
+            System.out.println("3  - Emitir Credencial");
+            System.out.println("4  - Exibir Schemas Criados");
+            System.out.println("5  - Exibir schema por ID");
+            System.out.println("6  - Listar Conexões");
+            System.out.println("7  - Listar Definições de credenciais");
+            System.out.println("8  - Solicitar prova de credenciais");
+            System.out.println("9  - Verificar apresentação de prova de credenciais");
+            System.out.println("10 - Aceitar Conexão");
+            System.out.println("0  - Exit\n");
 
             switch (scan.nextInt()) {
-                case 1:
+                case 1: //Cria um convite de conexão
                     createInvitation(ac, END_POINT);
                     break;
-                case 2:
+                case 2: //Cria uma definição de credencial
                     credentialDefinition(ac, scan);
                     break;
-                case 3:
+                case 3: // Envia uma credencial pelo método V 1.0
                     issueCredentialV1(ac, scan, did);
                     break;
-                case 4:
+                case 4: //Lista os id dos schemas criados
                     getSchemas(ac);
                     break;
-                case 5:
+                case 5: //Lista os schemas através de ID
                     getSchemaById(ac, scan);
                     break;
-                case 6:
+                case 6: //Lista as conexões realizadas
                     getConnections(ac);
                     break;
                 case 7:
@@ -108,6 +109,9 @@ public class AriesAgent {
                 case 9:
                     verifyPresentation(ac, presentationId);
                     break;
+                case 10:
+                	receiveInvitation(ac, scan);
+                	break;
                 case 0:
                     menuControl = false;
                     break;
@@ -421,6 +425,48 @@ public class AriesAgent {
         
         List<PresentationExchangeRecord> presentationExchangeRecords1 = presentationExchangeRecords.get();
         
+    }
+    
+    //Aceita conexão com outro agente
+    //TODO: ao invés de passar parâmetro por parâmetro, pegar apenas o invitation url e fazer o decode em base64 e separar os parâmetros para conexão
+    public static void receiveInvitation(AriesClient ac, Scanner scan) throws IOException {
+    	System.out.print("Informe o ID: ");
+    	String id = scan.next();
+    	
+    	System.out.print("Informe o type: ");
+    	String type = scan.next();
+    	
+    	System.out.print("Informe o Label: ");
+    	String label = scan.next();
+    	
+    	System.out.print("Informe o Service Endpoint: ");
+    	String serviceEndpoint = scan.next();
+    	
+    	List<String> recipientKeys = new LinkedList<String>();
+    	
+    	while(true) {
+    		System.out.print("Informe o Service Recipient Key ou 0 para encerrar: ");
+    		String recipient = scan.next();
+    		
+    		if(!recipient.equals("0")) {
+    			recipientKeys.add(recipient);
+    		} else {
+    			break;
+    		}
+    	}
+    	
+    	ReceiveInvitationRequest request = new ReceiveInvitationRequest().builder()
+    											.id(id)
+    											.type(type)
+    											.label(label)
+    											.serviceEndpoint(serviceEndpoint)
+    											.recipientKeys(recipientKeys)
+    											.build();
+    	
+    	
+    	Optional<ConnectionRecord> record = ac.connectionsReceiveInvitation(request, null);
+    	
+    	System.out.println( record.get().toString() );
     }
 
 }
