@@ -25,6 +25,7 @@ import org.hyperledger.aries.api.credential_definition.CredentialDefinition;
 import org.hyperledger.aries.api.credential_definition.CredentialDefinition.CredentialDefinitionRequest;
 import org.hyperledger.aries.api.credential_definition.CredentialDefinition.CredentialDefinitionResponse;
 import org.hyperledger.aries.api.credential_definition.CredentialDefinitionFilter;
+import org.hyperledger.aries.api.credentials.Credential;
 import org.hyperledger.aries.api.credentials.CredentialAttributes;
 import org.hyperledger.aries.api.credentials.CredentialPreview;
 import org.hyperledger.aries.api.issue_credential_v1.CredentialExchangeRole;
@@ -79,6 +80,7 @@ public class AriesAgent {
             System.out.println("8  - Solicitar prova de credenciais");
             System.out.println("9  - Verificar apresentação de prova de credenciais");
             System.out.println("10 - Aceitar Conexão");
+            System.out.println("11 - Listar Credenciais Recebidas");
             System.out.println("0  - Exit\n");
 
             switch (scan.nextInt()) {
@@ -111,6 +113,9 @@ public class AriesAgent {
                     break;
                 case 10:
                 	receiveInvitation(ac, scan);
+                	break;
+                case 11:
+                	getCredentialsReceive(ac);
                 	break;
                 case 0:
                     menuControl = false;
@@ -467,6 +472,23 @@ public class AriesAgent {
     	Optional<ConnectionRecord> record = ac.connectionsReceiveInvitation(request, null);
     	
     	System.out.println( record.get().toString() );
+    }
+    
+    //Lista as credenciais recebidas
+    public static void getCredentialsReceive(AriesClient ac) throws IOException {
+    	Optional<List<Credential>> credentials = ac.credentials();
+    	System.out.println("\n");
+    	
+    	for(int i = 0; i < credentials.get().size(); i++) {
+    		System.out.println( "Schema ID da Credencial: " + credentials.get().get(i).getSchemaId() );
+    		System.out.println( "Id Credential Definition da Credencial: " + credentials.get().get(i).getCredentialDefinitionId() );
+    		System.out.println( "referent da Credencial: " + credentials.get().get(i).getReferent() );
+    		System.out.println( "rev_reg_id: " + credentials.get().get(i).getRevRegId() );
+    		System.out.println( "cred_rev_id: " + credentials.get().get(i).getCredRevId() );
+    		System.out.println( "Atributos: " + credentials.get().get(i).getAttrs().toString() );
+    		
+    		System.out.println("\n");
+    	}
     }
 
 }
