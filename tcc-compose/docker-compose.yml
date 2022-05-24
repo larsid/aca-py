@@ -46,6 +46,10 @@ services:
         --auto-respond-credential-offer \
         --auto-respond-credential-request \
         --auto-store-credential \
+        --auto-respond-presentation-proposal \
+        --auto-respond-presentation-request \
+        --auto-verify-presentation \
+        --debug-presentations \
         --log-level info",
     ]
 
