@@ -41,6 +41,13 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <maxmem>256M</maxmem>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.mycompany.AriesAgent</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
         </plugins>
