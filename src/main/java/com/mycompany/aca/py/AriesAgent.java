@@ -57,7 +57,7 @@ public class AriesAgent {
     public static void main(String[] args) throws IOException, InterruptedException, WriterException {
         final String AGENT_ADDR = "localhost";
         final String AGENT_PORT = "8021";
-        final String END_POINT = "https://0aa0-191-34-173-155.sa.ngrok.io";
+        final String END_POINT = "https://larsid.net:2000";
         
         AriesClient ac = getAriesClient(AGENT_ADDR, AGENT_PORT);
 
