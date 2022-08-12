@@ -294,13 +294,12 @@ public class AriesAgent {
         String nameOfProofRequest = "Prova de educação";
         String nameOfAttrRequest = "nome";
         String version = "1.0";
-        String valueOfAttrRequest = "nome";
         String restrictionName = "cred_def_id";
         String restrictionValue = getCredentialDefinition(did).get(0);
 
         JsonObject restriction = new JsonObject();
         restriction.addProperty(restrictionName, restrictionValue);
-        PresentProofRequest.ProofRequest.ProofRequestedAttributes requestedAttributeValue = PresentProofRequest.ProofRequest.ProofRequestedAttributes.builder().restriction(restriction).name(valueOfAttrRequest).build();
+        PresentProofRequest.ProofRequest.ProofRequestedAttributes requestedAttributeValue = PresentProofRequest.ProofRequest.ProofRequestedAttributes.builder().restriction(restriction).name(nameOfAttrRequest).build();
         PresentProofRequest.ProofRequest proofRequest = PresentProofRequest.ProofRequest.builder().requestedAttribute(nameOfAttrRequest, requestedAttributeValue).name(nameOfProofRequest).version(version).build();
 
         PresentProofRequest presentProofRequest = PresentProofRequest.builder().comment(comment).connectionId(connectionId).proofRequest(proofRequest).build();
