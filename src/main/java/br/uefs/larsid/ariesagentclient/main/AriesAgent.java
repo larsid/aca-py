@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.aca.py;
+package br.uefs.larsid.ariesagentclient.main;
 
 import com.google.gson.JsonObject;
 import com.google.zxing.WriterException;
@@ -57,7 +57,7 @@ public class AriesAgent {
     public static void main(String[] args) throws IOException, InterruptedException, WriterException {
         final String AGENT_ADDR = "localhost";
         final String AGENT_PORT = "8021";
-        final String END_POINT = "https://0aa0-191-34-173-155.sa.ngrok.io";
+        final String END_POINT = "https://3f35-179-183-183-16.sa.ngrok.io";
         
         AriesClient ac = getAriesClient(AGENT_ADDR, AGENT_PORT);
 
@@ -86,7 +86,7 @@ public class AriesAgent {
 
             switch (scan.nextInt()) {
                 case 1: //Cria um convite de conexão
-                    createInvitation(ac, END_POINT);
+                    createInvitation(ac, "Invitation-label", END_POINT);
                     break;
                 case 2: //Cria uma definição de credencial
                     credentialDefinition(ac, scan);
@@ -142,8 +142,8 @@ public class AriesAgent {
     }
 
     //Gera um invitation url para conexão
-    public static void createInvitation(AriesClient ac, String END_POINT) throws IOException, WriterException {
-        Optional<CreateInvitationResponse> responseCI = ac.connectionsCreateInvitation(CreateInvitationRequest.builder().myLabel("Agent_Three").serviceEndpoint(END_POINT).build());
+    public static void createInvitation(AriesClient ac, String label, String END_POINT) throws IOException, WriterException {
+        Optional<CreateInvitationResponse> responseCI = ac.connectionsCreateInvitation(CreateInvitationRequest.builder().myLabel(label).serviceEndpoint(END_POINT).build());
         System.out.println("Invitation URL: " + responseCI.get().getInvitationUrl());
         Util.generateQRCode(responseCI.get().getInvitationUrl());
     }
@@ -194,7 +194,7 @@ public class AriesAgent {
     public static String credentialDefinition(AriesClient ac, Scanner scan) throws IOException {
         Optional<SchemaSendResponse> schema = createSchema(ac, scan);
 
-        Optional<CredentialDefinitionResponse> response = ac.credentialDefinitionsCreate(CredentialDefinitionRequest.builder().schemaId(schema.get().getSchemaId()).supportRevocation(true).tag("Agent_Three").revocationRegistrySize(1000).build());
+        Optional<CredentialDefinitionResponse> response = ac.credentialDefinitionsCreate(CredentialDefinitionRequest.builder().schemaId(schema.get().getSchemaId()).supportRevocation(false).tag("tag").revocationRegistrySize(1000).build());
 
         System.out.println("Credential Definition:");
         System.out.println(response.get().toString());
