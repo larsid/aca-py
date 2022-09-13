@@ -32,9 +32,14 @@ public class Main {
 
         Controller controller = new Controller(AGENT_ADDR, AGENT_PORT, AGENT_END_POINT);
 
-        //Base to create issuer class
+        /*Base to create issuer class*/
+        
+        /*Criar uma classe para servir de base para implementação de credenciais especificas*/
+        
+        /*Implementar demais métodos, verificação, recepção, ...*/
+        
         int idConvite = controller.getConnections().size();
-        int idSchema = controller.getSchemasCreated().size()+10;
+        int idSchema = controller.getSchemasCreated().size()+10; //precisa automatizar o número baseado na persistencia
         int idTag = 1;
 
         List<String> attributes = new ArrayList<>();
