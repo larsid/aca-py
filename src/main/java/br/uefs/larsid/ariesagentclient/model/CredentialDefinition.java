@@ -12,20 +12,29 @@ import org.hyperledger.aries.api.credential_definition.CredentialDefinition.Cred
  */
 public class CredentialDefinition {
 
+    private String id;
     private String tag;
     private Boolean revocable;
     private Integer revocationRegistrySize;
-    private String schemaId;
+    private Schema schema;
 
     public CredentialDefinition() {
 
     }
 
-    public CredentialDefinition(String tag, Boolean revocable, Integer revocationRegistrySize, String schemaId) {
+    public CredentialDefinition(String tag, Boolean revocable, Integer revocationRegistrySize, Schema schema) {
         this.tag = tag;
         this.revocable = revocable;
         this.revocationRegistrySize = revocationRegistrySize;
-        this.schemaId = schemaId;
+        this.schema = schema;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTag() {
@@ -36,7 +45,7 @@ public class CredentialDefinition {
         this.tag = tag;
     }
 
-    public Boolean getRevocable() {
+    public Boolean isRevocable() {
         return revocable;
     }
 
@@ -52,12 +61,20 @@ public class CredentialDefinition {
         this.revocationRegistrySize = revocationRegistrySize;
     }
 
+    public Schema getSchema() {
+        return schema;
+    }
+
+    public void setSchema(Schema schema) {
+        this.schema = schema;
+    }
+
     public CredentialDefinitionRequest build() {
-        if (this.tag == null || this.revocable == null || this.revocationRegistrySize == null || this.schemaId == null) {
+        if (this.tag == null || this.revocable == null || this.revocationRegistrySize == null || this.schema == null || this.schema.getId() == null) {
             return null;
         }
         return CredentialDefinitionRequest.builder()
-                .schemaId(schemaId)
+                .schemaId(schema.getId())
                 .supportRevocation(revocable)
                 .tag(tag)
                 .revocationRegistrySize(revocationRegistrySize)

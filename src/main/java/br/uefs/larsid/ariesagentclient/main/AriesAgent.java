@@ -4,6 +4,7 @@
  */
 package br.uefs.larsid.ariesagentclient.main;
 
+import br.uefs.larsid.ariesagentclient.util.Util;
 import com.google.gson.JsonObject;
 import com.google.zxing.WriterException;
 import java.io.IOException;

@@ -4,7 +4,7 @@
  */
 package br.uefs.larsid.ariesagentclient.controller;
 
-import br.uefs.larsid.ariesagentclient.main.Util;
+import br.uefs.larsid.ariesagentclient.util.Util;
 import br.uefs.larsid.ariesagentclient.model.AttributeRestriction;
 import br.uefs.larsid.ariesagentclient.model.Credential;
 import br.uefs.larsid.ariesagentclient.model.CredentialDefinition;
@@ -12,6 +12,7 @@ import br.uefs.larsid.ariesagentclient.model.PresentProof;
 import br.uefs.larsid.ariesagentclient.model.Schema;
 import com.google.zxing.WriterException;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import org.hyperledger.aries.AriesClient;
@@ -46,7 +47,7 @@ public class Controller {
 
     private AriesClient getAriesClient() {
         if (ariesClient == null) {
-            AriesClient.builder().url("http://" + AGENT_ADDR + ":" + AGENT_PORT).build();
+            ariesClient = AriesClient.builder().url("http://" + AGENT_ADDR + ":" + AGENT_PORT).build();
         }
         return ariesClient;
     }
@@ -71,28 +72,34 @@ public class Controller {
         return createInvitationResponse.getInvitationUrl();
     }
 
+    public String getJsonInvitation(CreateInvitationResponse createInvitationResponse) {
+        String param = getURLInvitation(createInvitationResponse).replaceFirst(".*?c_i=", "");
+        return new String(Base64.getDecoder().decode(param));
+    }
+
     public void generateQRCodeInvitation(CreateInvitationResponse createInvitationResponse) throws WriterException, IOException {
         Util.generateQRCode(createInvitationResponse.getInvitationUrl());
     }
 
-    public SchemaSendResponse createSchema(String name, String version, List<String> attributes) throws IOException {
-        Schema schema = new Schema(name, version);
-        schema.addAttributes(attributes);
-
-        return getAriesClient().schemas(schema.build()).get();
+    public SchemaSendResponse createSchema(Schema schema) throws IOException {
+        SchemaSendResponse schemaSendResponse = getAriesClient().schemas(schema.build()).get();
+        schema.setId(schemaSendResponse.getSchemaId());
+        
+        return schemaSendResponse;
     }
 
-    public CredentialDefinitionResponse createCredendentialDefinition(String tag, Boolean revocable, Integer revocationRegistrySize, String schemaId) throws IOException {
-        CredentialDefinition credentialDefinition = new CredentialDefinition(tag, revocable, revocationRegistrySize, schemaId);
-
-        return getAriesClient().credentialDefinitionsCreate(credentialDefinition.build()).get();
+    public CredentialDefinitionResponse createCredendentialDefinition(CredentialDefinition credentialDefinition) throws IOException {
+        CredentialDefinitionResponse credentialDefinitionResponse = getAriesClient().credentialDefinitionsCreate(credentialDefinition.build()).get();
+        credentialDefinition.setId(credentialDefinitionResponse.getCredentialDefinitionId());
+        
+        return credentialDefinitionResponse;
     }
 
-    public V1CredentialExchange issueCredentialV1(String connectionId, String credentialDefinitionID, Boolean autoRemovable, Map<String, String> values) throws IOException {
-        Credential credential = new Credential(credentialDefinitionID, autoRemovable);
-        credential.addValues(values);
-
-        return getAriesClient().issueCredentialSend(credential.buildV1(connectionId)).get();
+    public V1CredentialExchange issueCredentialV1(String connectionId, Credential credential) throws IOException {
+        V1CredentialExchange v1CredentialExchange = getAriesClient().issueCredentialSend(credential.buildV1(connectionId)).get();
+        credential.setId(v1CredentialExchange.getCredentialId());
+        
+        return v1CredentialExchange;
     }
 
     public List<String> getSchemasCreated() throws IOException {

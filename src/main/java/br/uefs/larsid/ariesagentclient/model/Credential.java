@@ -18,7 +18,8 @@ import org.hyperledger.aries.api.issue_credential_v1.V1CredentialProposalRequest
  */
 public class Credential {
 
-    private String credentialDefinitionID;
+    private String id;
+    private CredentialDefinition credentialDefinition;
     private Boolean autoRemovable;
     private Map<String, String> values;
 
@@ -26,20 +27,36 @@ public class Credential {
 
     }
 
-    public Credential(String credentialDefinitionID, Boolean autoRemovable) {
-        this.credentialDefinitionID = credentialDefinitionID;
+    public Credential(CredentialDefinition credentialDefinition, Boolean autoRemovable) {
+        this.credentialDefinition = credentialDefinition;
         this.autoRemovable = autoRemovable;
     }
 
-    public String getCredentialDefinitionID() {
-        return credentialDefinitionID;
+    public String getId() {
+        return id;
     }
 
-    public void setCredentialDefinitionID(String credentialDefinitionID) {
-        this.credentialDefinitionID = credentialDefinitionID;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public Boolean getAutoRemovable() {
+    public CredentialDefinition getCredentialDefinition() {
+        return credentialDefinition;
+    }
+
+    public void setCredentialDefinition(CredentialDefinition credentialDefinition) {
+        this.credentialDefinition = credentialDefinition;
+    }
+    
+    public CredentialDefinition getCredentialDefinitionID() {
+        return credentialDefinition;
+    }
+
+    public void setCredentialDefinitionID(CredentialDefinition credentialDefinition) {
+        this.credentialDefinition = credentialDefinition;
+    }
+
+    public Boolean isAutoRemovable() {
         return autoRemovable;
     }
 
@@ -58,8 +75,8 @@ public class Credential {
     }
 
     public Map<String, String> addValues(Map<String, String> values) {
-        if (values == null) {
-            values = new HashMap<>();
+        if (this.values == null) {
+            this.values = new HashMap<>();
         }
         this.values.putAll(values);
         return this.values;
@@ -74,12 +91,12 @@ public class Credential {
     }
 
     public V1CredentialProposalRequest buildV1(String connectionID) {
-        if (credentialDefinitionID == null || autoRemovable == null || values == null) {
+        if (credentialDefinition == null || credentialDefinition.getId() == null || autoRemovable == null || values == null) {
             return null;
         }
         return V1CredentialProposalRequest.builder()
                 .connectionId(connectionID)
-                .credentialDefinitionId(credentialDefinitionID)
+                .credentialDefinitionId(credentialDefinition.getId())
                 .autoRemove(autoRemovable)
                 .credentialProposal(getCredentialPreview())
                 .build();

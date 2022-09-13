@@ -14,6 +14,7 @@ import org.hyperledger.aries.api.schema.SchemaSendRequest;
  */
 public final class Schema {
 
+    private String id;
     private String name;
     private String version;
     private List<String> attributes;
@@ -25,6 +26,14 @@ public final class Schema {
     public Schema(String name, String version) {
         this.name = name;
         this.version = version;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -48,7 +57,7 @@ public final class Schema {
             this.attributes = new ArrayList<>();
         }
         if (!attributes.contains(attrName)) {
-            this.attributes.add(name);
+            this.attributes.add(attrName);
         }
         return this.attributes;
     }
