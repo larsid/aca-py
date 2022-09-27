@@ -25,12 +25,13 @@ import org.hyperledger.aries.api.schema.SchemaSendResponse;
  */
 public class Main {
 
+    public static Controller controller;
     public static void main(String[] args) throws IOException, WriterException {
         final String AGENT_ADDR = "localhost";
         final String AGENT_PORT = "8021";
         final String AGENT_END_POINT = "https://2f8e-177-99-172-106.sa.ngrok.io";
 
-        Controller controller = new Controller(AGENT_ADDR, AGENT_PORT, AGENT_END_POINT);
+        controller = new Controller(AGENT_ADDR, AGENT_PORT, AGENT_END_POINT);
 
         /*Base to create issuer class*/
         
@@ -129,7 +130,12 @@ public class Main {
         } while (menuControl);
     }
 
-    public static void createInvitation(Controller controller, String label) throws IOException, WriterException {
+    public static String createInvitation(String nodeUri) throws IOException, WriterException {
+        int idConvite = controller.getConnections().size();
+        return createInvitation(controller, ("Convite_" + idConvite++), nodeUri);
+    }
+
+    public static String createInvitation(Controller controller, String label, String ...nodeUri) throws IOException, WriterException {
         System.out.println("\nCriando convite de conexão ...");
 
         CreateInvitationResponse createInvitationResponse = controller.createInvitation(label);
@@ -147,6 +153,13 @@ public class Main {
         controller.generateQRCodeInvitation(createInvitationResponse);
 
         System.out.print("\nConvite Criado!\n");
+
+        return "{" +
+                "\"invitationURL\":\"" + url + "\"," +
+                "\"nodeUri\":\"" + nodeUri + "\"," +
+                "\"connectionId\":\"" + createInvitationResponse.getConnectionId() + "\""
+                +
+                "}";
     }
 
     private static void createCredentialDefinition(Controller controller, Schema schema, CredentialDefinition credentialDefinition) throws IOException {
