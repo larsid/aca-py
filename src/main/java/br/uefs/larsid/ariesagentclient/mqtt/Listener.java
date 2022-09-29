@@ -66,24 +66,15 @@ public class Listener implements IMqttMessageListener {
     /* Verificar qual o tópico recebido. */
     switch (topic) {
       case CREATE_INVITATION:
-        String result = Main.createInvitation(msg);
+        JsonObject jsonResult = Main.createInvitation(msg);
         printlnDebug(">> Send Invitation URL...");
-
-        JsonObject jsonResult = new Gson().fromJson(result, JsonObject.class);
 
         byte[] payload = jsonResult.toString().getBytes();
         this.mqttClient.publish(CREATE_INVITATION_RES, payload, QOS);
         break;
       case ACCEPT_INVITATION:
-        // Removendo Ip e Porta da URL
-        msg = msg.substring(msg.indexOf("=") + 1);
-        printlnDebug(msg);
-
-        byte[] decodedBytes = Base64.getDecoder().decode(msg);
-        String decodedString = new String(decodedBytes);
-        printlnDebug(decodedString);
-
-        JsonObject jsonInvitation = new Gson().fromJson(decodedString, JsonObject.class);
+        
+        JsonObject jsonInvitation = new Gson().fromJson(msg, JsonObject.class);
         // Main.receiveInvitation(jsonInvitation);
 
         printlnDebug(">> Invitation Accepted!");

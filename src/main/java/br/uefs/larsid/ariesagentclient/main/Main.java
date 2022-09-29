@@ -12,6 +12,8 @@ import br.uefs.larsid.ariesagentclient.mqtt.Listener;
 import br.uefs.larsid.ariesagentclient.mqtt.MQTTClient;
 import br.uefs.larsid.ariesagentclient.util.CLI;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.zxing.WriterException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -224,12 +226,12 @@ public class Main {
         }
     }
 
-    public static String createInvitation(String nodeUri) throws IOException, WriterException {
+    public static JsonObject createInvitation(String nodeUri) throws IOException, WriterException {
         int idConvite = controller.getConnections().size();
         return createInvitation(controller, ("Convite_" + idConvite++), nodeUri);
     }
 
-    public static String createInvitation(Controller controller, String label, String ...nodeUri) throws IOException, WriterException {
+    public static JsonObject createInvitation(Controller controller, String label, String nodeUri) throws IOException, WriterException {
         System.out.println("\nCriando convite de conexão ...");
 
         CreateInvitationResponse createInvitationResponse = controller.createInvitation(label);
@@ -242,18 +244,20 @@ public class Main {
 
         System.out.println("Json Invitation: " + json);
 
-        System.out.println("\nGerando QR Code ...");
+        // System.out.println("\nGerando QR Code ...");
 
-        controller.generateQRCodeInvitation(createInvitationResponse);
+        // controller.generateQRCodeInvitation(createInvitationResponse);
 
         System.out.print("\nConvite Criado!\n");
 
-        return "{" +
-                "\"invitationURL\":\"" + url + "\"," +
-                "\"nodeUri\":\"" + nodeUri + "\"," +
-                "\"connectionId\":\"" + createInvitationResponse.getConnectionId() + "\""
-                +
-                "}";
+        JsonObject jsonInvitation = new Gson().fromJson(json, JsonObject.class);
+
+        jsonInvitation.addProperty("connectionId", createInvitationResponse.getConnectionId());
+        jsonInvitation.addProperty("nodeUri", nodeUri);
+
+        printlnDebug("Final JSON: " + jsonInvitation.toString());
+
+        return jsonInvitation;
     }
 
     private static void createCredentialDefinition(Controller controller, Schema schema, CredentialDefinition credentialDefinition) throws IOException {
