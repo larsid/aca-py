@@ -1,0 +1,65 @@
+version: '3'
+services:
+  aca-py: 
+    image: bcgovimages/aries-cloudagent:py36-1.16-1_1.0.0-rc0
+    depends_on:
+      - wallet-db
+    ports:
+      - "${ACAPY_ADMIN_PORT}:${ACAPY_ADMIN_PORT}"
+      - "${ACAPY_ENDPOINT_PORT}:${ACAPY_ENDPOINT_PORT}"
+    entrypoint: /bin/bash
+    command: [
+      "-c",
+        "curl -d '{\"seed\":\"${AGENT_WALLET_SEED}\", \"role\":\"TRUST_ANCHOR\", \"alias\":\"${LABEL}\"}' -X POST ${LEDGER_URL}/register; \
+          sleep 5; \
+          aca-py start \
+          --auto-provision \
+          -it http '0.0.0.0' ${ACAPY_ENDPOINT_PORT} \
+          -ot http \
+          --admin '0.0.0.0' ${ACAPY_ADMIN_PORT} \
+          -e ${ACAPY_ENDPOINT_URL} \
+          --wallet-type indy \
+          --wallet-name ${WALLET_NAME}
+          --wallet-key ${WALLET_KEY}
+          --wallet-storage-type postgres_storage
+          --wallet-storage-config '{\"url\":\"wallet-db:${POSTGRES_PORT}\",\"max_connections\":5}'
+          --wallet-storage-creds '{\"account\":\"${POSTGRES_USER}\",\"password\":\"${POSTGRES_PASSWORD}\",\"admin_account\":\"${POSTGRES_USER}\",\"admin_password\":\"${POSTGRES_PASSWORD}\"}'
+          --seed ${AGENT_WALLET_SEED} \
+          --genesis-url ${LEDGER_URL} \
+          --label ${LABEL} \
+          --auto-accept-invites \
+          --auto-accept-requests \
+          --admin-insecure-mode \
+          --auto-store-credential \
+          --accept-taa service_agreement 2.0 \
+          --auto-ping-connection \
+          --debug-credentials \
+          --preserve-exchange-records \
+          --auto-respond-credential-proposal \
+          --auto-respond-credential-offer \
+          --auto-respond-credential-request \
+          --auto-store-credential \
+          --auto-respond-presentation-proposal \
+          --auto-respond-presentation-request \
+          --auto-verify-presentation \
+          --debug-presentations \
+          --log-level info",
+      ]
+    networks:
+      - agent-network
+  wallet-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes:
+      - ./wallet-db-data:/var/lib/pgsql/data
+    networks:
+      - agent-network
+    command: -p ${POSTGRES_PORT}
+  
+networks:
+  agent-network:
+      name: docker_agent-server
