@@ -303,6 +303,7 @@ public class AriesAgent {
         PresentProofRequest.ProofRequest.ProofRequestedAttributes requestedAttributeValue = PresentProofRequest.ProofRequest.ProofRequestedAttributes.builder().restriction(restriction).name(nameOfAttrRequest).build();
         PresentProofRequest.ProofRequest proofRequest = PresentProofRequest.ProofRequest.builder().requestedAttribute(nameOfAttrRequest, requestedAttributeValue).name(nameOfProofRequest).version(version).build();
 
+        System.out.print(proofRequest);
         PresentProofRequest presentProofRequest = PresentProofRequest.builder().comment(comment).connectionId(connectionId).proofRequest(proofRequest).build();
 
         System.out.println(presentProofRequest);

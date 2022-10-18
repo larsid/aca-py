@@ -18,7 +18,7 @@ public class AttributeRestriction {
 
     public AttributeRestriction(String name, String value, String nameRestriction, String propertyRestriction) {
         this.name = name;
-        this.name = nameRestriction;
+        this.nameRestriction = nameRestriction;
         this.restriction = new JsonObject();
         this.restriction.addProperty(propertyRestriction, value);
     }

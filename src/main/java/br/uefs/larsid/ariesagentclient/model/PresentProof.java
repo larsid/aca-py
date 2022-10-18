@@ -4,6 +4,7 @@
  */
 package br.uefs.larsid.ariesagentclient.model;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.hyperledger.aries.api.present_proof.PresentProofRequest;
@@ -59,6 +60,9 @@ public class PresentProof {
     }
 
     public Map<String, ProofRequestedAttributes> addAttributesRestrictions(List<AttributeRestriction> attributesRestricitions) {
+        if(this.attributes==null){
+            this.attributes = new HashMap<>();
+        }
         for (AttributeRestriction attributeRestriction : attributesRestricitions) {
             addAttributeRestriction(attributeRestriction);
         }
@@ -66,6 +70,7 @@ public class PresentProof {
     }
 
     private ProofRequest getProofRequest() {
+        System.out.println(attributes);
         return ProofRequest.builder().name(name).requestedAttributes(attributes).version(version).build();
     }
 

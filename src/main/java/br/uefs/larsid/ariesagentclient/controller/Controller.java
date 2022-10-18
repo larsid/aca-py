@@ -125,5 +125,9 @@ public class Controller {
 
         return getAriesClient().presentProofSendRequest(presentProof.build(connectionId)).get();
     }
+    
+    public PresentationExchangeRecord verifyPresentation(String presentationId) throws IOException{
+        return getAriesClient().presentProofRecordsVerifyPresentation(presentationId).get();
+    }
 
 }

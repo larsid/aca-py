@@ -1,3 +1,4 @@
+br\uefs\larsid\ariesagentclient\main\CLI.class
 br\uefs\larsid\ariesagentclient\model\AttributeRestriction.class
 br\uefs\larsid\ariesagentclient\model\PresentProof.class
 br\uefs\larsid\ariesagentclient\services\MQTTClientService.class
