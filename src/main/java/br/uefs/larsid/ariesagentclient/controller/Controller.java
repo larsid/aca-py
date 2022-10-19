@@ -14,7 +14,6 @@ import com.google.zxing.WriterException;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
-import java.util.Map;
 import org.hyperledger.aries.AriesClient;
 import org.hyperledger.aries.api.connection.ConnectionRecord;
 import org.hyperledger.aries.api.connection.CreateInvitationRequest;
@@ -119,15 +118,15 @@ public class Controller {
         return getAriesClient().credentialDefinitionsCreated(credentialDefinitionFilter).get();
     }
 
-    public PresentationExchangeRecord sendRequestPresentationRequest(String name, String comment, String version, String connectionId, List<AttributeRestriction> attributesRestrictions) throws IOException {
+    public String sendRequestPresentationRequest(String name, String comment, String version, String connectionId, List<AttributeRestriction> attributesRestrictions) throws IOException {
         PresentProof presentProof = new PresentProof(name, comment, version);
         presentProof.addAttributesRestrictions(attributesRestrictions);
 
-        return getAriesClient().presentProofSendRequest(presentProof.build(connectionId)).get();
+        return getAriesClient().presentProofSendRequest(presentProof.build(connectionId)).get().getPresentationExchangeId();
     }
     
-    public PresentationExchangeRecord verifyPresentation(String presentationId) throws IOException{
-        return getAriesClient().presentProofRecordsVerifyPresentation(presentationId).get();
+    public PresentationExchangeRecord getPresentation(String id) throws IOException{
+        return getAriesClient().presentProofRecordsGetById(id).get();
     }
 
 }

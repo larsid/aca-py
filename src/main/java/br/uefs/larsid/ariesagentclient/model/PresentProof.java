@@ -54,7 +54,7 @@ public class PresentProof {
     }
 
     public Map<String, ProofRequestedAttributes> addAttributeRestriction(AttributeRestriction attributeRestriction) {
-        ProofRequestedAttributes proofRequestedAttributes = ProofRequestedAttributes.builder().name(attributeRestriction.getNameRestriction()).restriction(attributeRestriction.getRestriction()).build();
+        ProofRequestedAttributes proofRequestedAttributes = ProofRequestedAttributes.builder().name(attributeRestriction.getName()).restriction(attributeRestriction.getRestriction()).build();
         this.attributes.put(attributeRestriction.getName(), proofRequestedAttributes);
         return this.attributes;
     }
@@ -70,11 +70,11 @@ public class PresentProof {
     }
 
     private ProofRequest getProofRequest() {
-        System.out.println(attributes);
         return ProofRequest.builder().name(name).requestedAttributes(attributes).version(version).build();
     }
 
     public PresentProofRequest build(String connectionId) {
+        System.out.println("Proof: "+getProofRequest());
         return PresentProofRequest.builder().comment(comment).connectionId(connectionId).proofRequest(getProofRequest()).build();
     }
 

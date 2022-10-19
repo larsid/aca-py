@@ -58,7 +58,7 @@ public class AriesAgent {
     public static void main(String[] args) throws IOException, InterruptedException, WriterException {
         final String AGENT_ADDR = "localhost";
         final String AGENT_PORT = "8021";
-        final String END_POINT = "https://3f35-179-183-183-16.sa.ngrok.io";
+        final String END_POINT = "https://b1f1-45-184-139-246.sa.ngrok.io";
         
         AriesClient ac = getAriesClient(AGENT_ADDR, AGENT_PORT);
 
@@ -290,13 +290,13 @@ public class AriesAgent {
 
     //Solicita uma apresentação de credencial
     public static String requestProofCredential(AriesClient ac, String did) throws IOException, InterruptedException {
-        String connectionId = getConnections(ac).get(0).getConnectionId();
+        String connectionId = getConnections(ac).get(2).getConnectionId();
         String comment = "Prove que é aluno";
         String nameOfProofRequest = "Prova de educação";
         String nameOfAttrRequest = "nome";
         String version = "1.0";
         String restrictionName = "cred_def_id";
-        String restrictionValue = getCredentialDefinition(did).get(0);
+        String restrictionValue = getCredentialDefinition(did).get(2);
 
         JsonObject restriction = new JsonObject();
         restriction.addProperty(restrictionName, restrictionValue);
@@ -506,14 +506,11 @@ public class AriesAgent {
         System.out.println("Credetial revocation ID: ");
         String credRevId = scan.next();
 
-        
-        
         System.out.println("credExId: "+credExId);
         System.out.println("revRegId: "+revRegId);
         System.out.println("credRevId: "+revRegId);
         
         RevokeRequest revokeRequest = RevokeRequest.builder().revRegId(revRegId).credRevId(credRevId).publish(true).build(); //Pode ser usado esse
-        //RevokeRequest revokeRequest = RevokeRequest.builder().credExId(credExId).publish().build(); //Ou esse
         
         ac.revocationRevoke(revokeRequest);
     }

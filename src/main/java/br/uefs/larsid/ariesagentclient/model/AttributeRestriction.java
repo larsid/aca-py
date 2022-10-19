@@ -12,23 +12,17 @@ import com.google.gson.JsonObject;
  */
 public class AttributeRestriction {
 
-    private String name;
-    private String nameRestriction;
-    private JsonObject restriction;
+    private final String name;
+    private final JsonObject restriction;
 
-    public AttributeRestriction(String name, String value, String nameRestriction, String propertyRestriction) {
+    public AttributeRestriction(String name, String nameRestriction, String propertyRestriction) {
         this.name = name;
-        this.nameRestriction = nameRestriction;
         this.restriction = new JsonObject();
-        this.restriction.addProperty(propertyRestriction, value);
+        this.restriction.addProperty(nameRestriction, propertyRestriction);
     }
 
     public String getName() {
         return name;
-    }
-
-    public String getNameRestriction() {
-        return nameRestriction;
     }
 
     public JsonObject getRestriction() {
