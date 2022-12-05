@@ -25,7 +25,7 @@ services:
           --wallet-storage-config '{\"url\":\"wallet-db:${POSTGRES_PORT}\",\"max_connections\":5}'
           --wallet-storage-creds '{\"account\":\"${POSTGRES_USER}\",\"password\":\"${POSTGRES_PASSWORD}\",\"admin_account\":\"${POSTGRES_USER}\",\"admin_password\":\"${POSTGRES_PASSWORD}\"}'
           --seed ${AGENT_WALLET_SEED} \
-          --genesis-url ${LEDGER_URL} \
+          --genesis-url ${LEDGER_GENESIS_URL} \
           --label ${LABEL} \
           --auto-accept-invites \
           --auto-accept-requests \

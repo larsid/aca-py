@@ -29,6 +29,14 @@ public class CredentialDefinition {
         this.schema = schema;
     }
 
+    public CredentialDefinition(String id, String tag, Boolean revocable, Integer revocationRegistrySize, Schema schema) {
+        this.id = id;
+        this.tag = tag;
+        this.revocable = revocable;
+        this.revocationRegistrySize = revocationRegistrySize;
+        this.schema = schema;
+    } 
+
     public String getId() {
         return id;
     }
@@ -79,6 +87,16 @@ public class CredentialDefinition {
                 .tag(tag)
                 .revocationRegistrySize(revocationRegistrySize)
                 .build();
+    }
+    
+    @Override
+    public String toString(){
+        return 
+            "id: "+id+
+            "\ntag: "+tag+
+            "\nrevocable: "+revocable+
+            "\nrevocationRegistrySize: "+revocationRegistrySize+
+            "\nschema: "+schema.toString();
     }
 
 }

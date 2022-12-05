@@ -8,12 +8,14 @@ import br.uefs.larsid.ariesagentclient.util.Util;
 import br.uefs.larsid.ariesagentclient.model.AttributeRestriction;
 import br.uefs.larsid.ariesagentclient.model.Credential;
 import br.uefs.larsid.ariesagentclient.model.CredentialDefinition;
+import br.uefs.larsid.ariesagentclient.model.Invitation;
 import br.uefs.larsid.ariesagentclient.model.PresentProof;
 import br.uefs.larsid.ariesagentclient.model.Schema;
 import com.google.zxing.WriterException;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import org.hyperledger.aries.AriesClient;
 import org.hyperledger.aries.api.connection.ConnectionRecord;
 import org.hyperledger.aries.api.connection.CreateInvitationRequest;
@@ -31,6 +33,8 @@ import org.hyperledger.aries.api.schema.SchemasCreatedFilter;
  * @author Emers
  */
 public class Controller {
+
+    private static final Integer REVOCATION_REGITRY_SIZE = 1000;
 
     private final String AGENT_ADDR;
     private final String AGENT_PORT;
@@ -83,26 +87,58 @@ public class Controller {
     public SchemaSendResponse createSchema(Schema schema) throws IOException {
         SchemaSendResponse schemaSendResponse = getAriesClient().schemas(schema.build()).get();
         schema.setId(schemaSendResponse.getSchemaId());
-        
+
         return schemaSendResponse;
     }
 
     public CredentialDefinitionResponse createCredendentialDefinition(CredentialDefinition credentialDefinition) throws IOException {
         CredentialDefinitionResponse credentialDefinitionResponse = getAriesClient().credentialDefinitionsCreate(credentialDefinition.build()).get();
         credentialDefinition.setId(credentialDefinitionResponse.getCredentialDefinitionId());
-        
+
         return credentialDefinitionResponse;
     }
 
     public V1CredentialExchange issueCredentialV1(String connectionId, Credential credential) throws IOException {
         V1CredentialExchange v1CredentialExchange = getAriesClient().issueCredentialSend(credential.buildV1(connectionId)).get();
         credential.setId(v1CredentialExchange.getCredentialId());
-        
+
         return v1CredentialExchange;
+    }
+
+    public ConnectionRecord receiveInvitation(Invitation invitation) throws IOException {
+        ConnectionRecord connectionRecord = getAriesClient().connectionsReceiveInvitation(invitation.build(), null).get();
+        return connectionRecord;
     }
 
     public List<String> getSchemasCreated() throws IOException {
         return getAriesClient().schemasCreated(SchemasCreatedFilter.builder().build()).get();
+    }
+
+    public Schema getSchemasById(String schemaID) throws IOException {
+        SchemaSendResponse.Schema schemaAgent = getAriesClient().schemasGetById(schemaID).get();
+        Schema schema = new Schema(schemaAgent.getId(), schemaAgent.getName(), schemaAgent.getVersion(), schemaAgent.getAttrNames());
+
+        return schema;
+    }
+
+    public CredentialDefinition getCredentialDefinitionById(String credentialDefinitionID) throws IOException {
+        Optional<org.hyperledger.aries.api.credential_definition.CredentialDefinition> optionalCredentialDefinitionAgent = getAriesClient().credentialDefinitionsGetById(credentialDefinitionID);
+
+        if(optionalCredentialDefinitionAgent.isEmpty()){
+            return null;
+        }
+        
+        org.hyperledger.aries.api.credential_definition.CredentialDefinition credentialDefinitionAgent = optionalCredentialDefinitionAgent.get();
+        
+        CredentialDefinition credentialDefinition = new CredentialDefinition(
+                credentialDefinitionAgent.getId(), 
+                credentialDefinitionAgent.getTag(), 
+                false, 
+                REVOCATION_REGITRY_SIZE, 
+                getSchemasById(credentialDefinitionAgent.getSchemaId())
+            );
+        
+        return credentialDefinition;
     }
 
     public SchemaSendResponse.Schema getSchemaById(String schemaId) throws IOException {
@@ -124,8 +160,8 @@ public class Controller {
 
         return getAriesClient().presentProofSendRequest(presentProof.build(connectionId)).get().getPresentationExchangeId();
     }
-    
-    public PresentationExchangeRecord getPresentation(String id) throws IOException{
+
+    public PresentationExchangeRecord getPresentation(String id) throws IOException {
         return getAriesClient().presentProofRecordsGetById(id).get();
     }
 

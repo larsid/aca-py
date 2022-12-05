@@ -28,6 +28,13 @@ public final class Schema {
         this.version = version;
     }
 
+    public Schema(String id, String name, String version, List<String> attributes) {
+        this.id = id;
+        this.name = name;
+        this.version = version;
+        this.attributes = attributes;
+    }
+    
     public String getId() {
         return id;
     }
@@ -82,5 +89,14 @@ public final class Schema {
                 .schemaVersion(version)
                 .attributes(attributes)
                 .build();
+    }
+    
+    @Override
+    public String toString(){
+        return
+            "id: "+id+
+            " name: "+name+
+            " version: "+version+
+            " attributes: "+attributes.toString();
     }
 }
