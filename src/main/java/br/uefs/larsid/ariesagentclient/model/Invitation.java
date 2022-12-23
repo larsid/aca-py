@@ -4,7 +4,6 @@
  */
 package br.uefs.larsid.ariesagentclient.model;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;

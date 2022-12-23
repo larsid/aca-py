@@ -47,14 +47,6 @@ public class Credential {
     public void setCredentialDefinition(CredentialDefinition credentialDefinition) {
         this.credentialDefinition = credentialDefinition;
     }
-    
-    public CredentialDefinition getCredentialDefinitionID() {
-        return credentialDefinition;
-    }
-
-    public void setCredentialDefinitionID(CredentialDefinition credentialDefinition) {
-        this.credentialDefinition = credentialDefinition;
-    }
 
     public Boolean isAutoRemovable() {
         return autoRemovable;

@@ -1,5 +1,12 @@
 version: '3'
 services:
+  ngrok:
+    image: ngrok/ngrok
+    ports:
+      - "${NGROK_PORT}:4040"
+    command: "http aca-py:\"${ACAPY_ENDPOINT_PORT}\""
+    networks:
+      - agent-network
   aca-py: 
     image: bcgovimages/aries-cloudagent:py36-1.16-1_1.0.0-rc0
     depends_on:
@@ -17,7 +24,7 @@ services:
           -it http '0.0.0.0' ${ACAPY_ENDPOINT_PORT} \
           -ot http \
           --admin '0.0.0.0' ${ACAPY_ADMIN_PORT} \
-          -e ${ACAPY_ENDPOINT_URL} \
+          -e $(curl http://ngrok:4040/api/tunnels | /var/lib/jq/jq -r .tunnels[0].public_url) \ 
           --wallet-type indy \
           --wallet-name ${WALLET_NAME}
           --wallet-key ${WALLET_KEY}
@@ -47,6 +54,8 @@ services:
       ]
     networks:
       - agent-network
+    volumes:
+      - ./jq:/var/lib/jq
   wallet-db:
     image: postgres:latest
     environment:
@@ -62,4 +71,4 @@ services:
   
 networks:
   agent-network:
-      name: docker_agent-server
+      name: von_von

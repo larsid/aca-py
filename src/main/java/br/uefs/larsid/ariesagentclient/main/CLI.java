@@ -18,18 +18,15 @@ import com.google.gson.JsonObject;
 import com.google.zxing.WriterException;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import org.hyperledger.aries.api.connection.ConnectionRecord;
 import org.hyperledger.aries.api.connection.CreateInvitationResponse;
-import org.hyperledger.aries.api.credential_definition.CredentialDefinition.CredentialDefinitionsCreated;
 import org.hyperledger.aries.api.present_proof.PresentationExchangeRecord;
 import org.hyperledger.aries.api.present_proof.PresentationExchangeState;
 import org.hyperledger.aries.api.schema.SchemaSendResponse;
@@ -42,7 +39,7 @@ public class CLI {
 
     public static void main(String[] args) throws IOException, WriterException, InterruptedException {
         final String AGENT_ADDR = "localhost";
-        final String AGENT_PORT = "8021";
+        final String AGENT_PORT = "7021";
         final String AGENT_END_POINT = "https://611a-45-184-139-246.sa.ngrok.io";
 
         Controller controller = new Controller(AGENT_ADDR, AGENT_PORT, AGENT_END_POINT);
