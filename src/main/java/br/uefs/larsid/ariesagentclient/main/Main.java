@@ -84,7 +84,7 @@ public class Main {
         // final String AGENT_PORT = "8021";
         // final String AGENT_END_POINT = "https://2f8e-177-99-172-106.sa.ngrok.io";
 
-        controller = new Controller(agentIp, agentPort, endpoint);
+        controller = new Controller(agentIp, agentPort);
 
         /*Base to create issuer class*/
         

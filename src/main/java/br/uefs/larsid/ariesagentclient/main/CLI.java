@@ -39,11 +39,11 @@ public class CLI {
 
     public static void main(String[] args) throws IOException, WriterException, InterruptedException {
         final String AGENT_ADDR = "localhost";
-        final String AGENT_PORT = "7021";
-        final String AGENT_END_POINT = "https://611a-45-184-139-246.sa.ngrok.io";
+        final String AGENT_PORT = "8021";
 
-        Controller controller = new Controller(AGENT_ADDR, AGENT_PORT, AGENT_END_POINT);
+        Controller controller = new Controller(AGENT_ADDR, AGENT_PORT);
 
+        System.out.println("\nEnd Point: "+controller.getEndPoint()+"\n");
         /*Base to create issuer class*/
  /*Criar uma classe para servir de base para implementação de credenciais especificas*/
  /*Implementar demais métodos, verificação, recepção, ...*/

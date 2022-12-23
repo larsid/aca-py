@@ -38,14 +38,12 @@ public class Controller {
 
     private final String AGENT_ADDR;
     private final String AGENT_PORT;
-    private final String AGENT_END_POINT;
 
     private AriesClient ariesClient;
 
-    public Controller(String AGENT_ADDR, String AGENT_PORT, String AGENT_END_POINT) {
+    public Controller(String AGENT_ADDR, String AGENT_PORT) {
         this.AGENT_ADDR = AGENT_ADDR;
         this.AGENT_PORT = AGENT_PORT;
-        this.AGENT_END_POINT = AGENT_END_POINT;
     }
 
     private AriesClient getAriesClient() {
@@ -62,11 +60,15 @@ public class Controller {
     public String getDid() throws IOException {
         return getAriesClient().walletDidPublic().get().getDid();
     }
+    
+    public String getEndPoint() throws IOException {
+        return getAriesClient().walletGetDidEndpoint(getDid()).get().getEndpoint();
+    }
 
     public CreateInvitationResponse createInvitation(String label) throws IOException {
         CreateInvitationRequest createInvitationRequest = CreateInvitationRequest.builder()
                 .myLabel(label)
-                .serviceEndpoint(AGENT_END_POINT)
+                .serviceEndpoint(getEndPoint())
                 .build();
         return getAriesClient().connectionsCreateInvitation(createInvitationRequest).get();
     }
