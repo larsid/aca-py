@@ -39,7 +39,7 @@ public class CLI {
 
     public static void main(String[] args) throws IOException, WriterException, InterruptedException {
         final String AGENT_ADDR = "localhost";
-        final String AGENT_PORT = "8021";
+        final String AGENT_PORT = "7021";
 
         Controller controller = new Controller(AGENT_ADDR, AGENT_PORT);
 
