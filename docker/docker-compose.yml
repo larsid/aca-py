@@ -3,10 +3,15 @@ services:
   ngrok:
     image: ngrok/ngrok
     ports:
-      - "${NGROK_PORT}:4040"
-    command: "http aca-py:\"${ACAPY_ENDPOINT_PORT}\""
+      - "${NGROK_PORT_OUT}:${NGROK_PORT_IN}"
+    entrypoint: /bin/bash
+    command: ["-c",
+                "echo \"version: 2\nweb_addr: 0.0.0.0:${NGROK_PORT_IN}\" > /var/lib/ngrok/ngrok.yml; \
+                /entrypoint.sh http aca-py:${ACAPY_ENDPOINT_PORT};",]
     networks:
       - agent-network
+    volumes:
+      - ./ngrok:/var/lib/ngrok
   aca-py: 
     image: bcgovimages/aries-cloudagent:py36-1.16-1_1.0.0-rc0
     depends_on:
@@ -24,7 +29,7 @@ services:
           -it http '0.0.0.0' ${ACAPY_ENDPOINT_PORT} \
           -ot http \
           --admin '0.0.0.0' ${ACAPY_ADMIN_PORT} \
-          -e $(curl http://ngrok:4040/api/tunnels | /var/lib/jq/jq -r .tunnels[0].public_url) \ 
+          -e $(curl http://ngrok:${NGROK_PORT_IN}/api/tunnels | /var/lib/jq/jq -r .tunnels[0].public_url) \ 
           --wallet-type indy \
           --wallet-name ${WALLET_NAME}
           --wallet-key ${WALLET_KEY}
