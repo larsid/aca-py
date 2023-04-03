@@ -2,3 +2,4 @@ tcc-compose/*.env
 ngrok/*
 times*
 qrcode.png
+target
