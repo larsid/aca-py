@@ -38,8 +38,8 @@ import org.hyperledger.aries.api.schema.SchemaSendResponse;
 public class CLI {
 
     public static void main(String[] args) throws IOException, WriterException, InterruptedException {
-        final String AGENT_ADDR = "localhost";
-        final String AGENT_PORT = "7021";
+        final String AGENT_ADDR = System.getenv("AGENT_ADDR");
+        final String AGENT_PORT = System.getenv("AGENT_PORT");
 
         Controller controller = new Controller(AGENT_ADDR, AGENT_PORT);
 
@@ -157,11 +157,11 @@ public class CLI {
 
         System.out.println("Json Invitation: " + json);
 
-        System.out.println("\nGerando QR Code ...");
+        // System.out.println("\nGerando QR Code ...");
 
-        controller.generateQRCodeInvitation(createInvitationResponse);
+        // controller.generateQRCodeInvitation(createInvitationResponse);
 
-        System.out.print("\nConvite Criado!\n");
+        // System.out.print("\nConvite Criado!\n");
     }
 
     private static void listCredentialDefinitionsCreated(Controller controller) throws IOException {
